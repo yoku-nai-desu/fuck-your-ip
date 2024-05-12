@@ -15,5 +15,9 @@ some of other users sharing your IP or that specifice IP is reported to one of t
 abusive IPs and accept reports)
 ** techincally , it's a bit more complicated than that but if you know, than you know **
 
+## why even write this?
+
+no reason really :)
+
 
  
