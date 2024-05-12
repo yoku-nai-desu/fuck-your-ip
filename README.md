@@ -6,6 +6,7 @@ so, sometimes, due to the stupidity of your ISP (pathetic!) or your VPN provider
 or maybe unacceptable from a site, as I understand(sort of) , the fault usually lies within your ip
 
 even more details:
+
 -you are using one of those VPNs that are utilizing a cheap VPS or shared IP(duh), which of course,
 you can pay to get one of them juicy dedicated IPs
 
