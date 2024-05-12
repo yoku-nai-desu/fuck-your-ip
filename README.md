@@ -2,8 +2,9 @@
 
 ## what?
 
-so, sometimes, due to the stupidity of your ISP (pathetic!) or your VPN provider , you may recieve a forbidden
-or maybe unacceptable from a site, as I understand(sort of) , the fault usually lies within your ip
+so, sometimes, due to the stupidity of your ISP (pathetic!) or your VPN provider , you may recieve a forbidden(403)
+or unacceptable(406) from a site, as I understand(sort of) , the fault usually lies within your ip 
+this mini-script checks the response code to see if big G or some other search engines have blacklisted the ip (whether temporarily or not)
 
 ### even more details:
 
