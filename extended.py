@@ -1,5 +1,6 @@
 import requests
 import random
+from bs4 import BeautifulSoup
 
 def get_random_line(filename):
     with open(filename, 'r') as file:
@@ -10,6 +11,21 @@ def is_captcha_response(response_text):
     captcha_keywords = [
         'recaptcha', 'g-recaptcha', 'h-captcha', 'cf-turnstile', 'captcha', 'verify you are human'
     ]
+    soup = BeautifulSoup(response_text, 'html.parser')
+    # Check for common CAPTCHA-related elements
+    captcha_indicators = [
+        {'tag': 'div', 'class': 'g-recaptcha'},          # Google ReCaptcha
+        {'tag': 'div', 'class': 'h-captcha'},            # hCaptcha
+        {'tag': 'div', 'class': 'cf-turnstile'},         # Cloudflare Turnstile
+        {'tag': 'div', 'class': 'captcha'},              # Generic
+        {'tag': 'iframe', 'src': 'recaptcha'},           # ReCaptcha iframe
+        {'tag': 'iframe', 'src': 'hcaptcha'},            # hCaptcha iframe
+        {'tag': 'iframe', 'src': 'cf-turnstile'},        # Cloudflare Turnstile iframe
+    ]
+    for indicator in captcha_indicators:
+        if soup.find(indicator['tag'], class_=indicator.get('class')) or soup.find(indicator['tag'], src=indicator.get('src')):
+            return True
+    # Fallback to keyword search if no specific elements are found
     return any(keyword in response_text.lower() for keyword in captcha_keywords)
 
 def check_responses(urls, error_codes):
