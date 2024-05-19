@@ -4,8 +4,9 @@ from bs4 import BeautifulSoup
 import logging
 import time
 
-# Setup logging
-logging.basicConfig(level=logging.DEBUG)
+# Setup logging to a file
+logging.basicConfig(filename='captcha_detection.log', level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 # List of common User-Agent strings
 user_agents = [
@@ -58,11 +59,17 @@ def check_responses(urls, error_codes, retries=3):
                     response = session.get(url)
                     logging.debug(f"URL: {url}, Status Code: {response.status_code}, Headers: {response.headers}")
                     if response.status_code in error_codes:
-                        print(f"{url} = {response.status_code}, Message = \"{get_random_line('error_messages.txt')}\"")
+                        error_message = f"{url} = {response.status_code}, Message = \"{get_random_line('error_messages.txt')}\""
+                        logging.info(error_message)
+                        print(error_message)
                     elif is_captcha_response(response.text):
-                        print(f"{url} = CAPTCHA detected, please verify manually.")
+                        captcha_message = f"{url} = CAPTCHA detected, please verify manually."
+                        logging.warning(captcha_message)
+                        print(captcha_message)
                     else:
-                        print(f"{url} = {response.status_code}")
+                        success_message = f"{url} = {response.status_code}"
+                        logging.info(success_message)
+                        print(success_message)
                         break  # Break out of the retry loop on success
             except requests.exceptions.RequestException as e:
                 logging.error(f"Error fetching {url}: {e}")
