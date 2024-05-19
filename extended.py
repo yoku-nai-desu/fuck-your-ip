@@ -1,6 +1,11 @@
 import requests
 import random
 from bs4 import BeautifulSoup
+import logging
+import time
+
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
 
 # List of common User-Agent strings
 user_agents = [
@@ -40,24 +45,30 @@ def is_captcha_response(response_text):
     # Fallback to keyword search if no specific elements are found
     return any(keyword in response_text.lower() for keyword in captcha_keywords)
 
-def check_responses(urls, error_codes):
+def check_responses(urls, error_codes, retries=3):
     for url in urls:
-        try:
-            headers = {
-                'User-Agent': random.choice(user_agents),
-                'Cache-Control': 'no-cache'
-            }
-            with requests.Session() as session:
-                session.headers.update(headers)
-                response = session.get(url)
-                if response.status_code in error_codes:
-                    print(f"{url} = {response.status_code}, Message = \"{get_random_line('error_messages.txt')}\"")
-                elif is_captcha_response(response.text):
-                    print(f"{url} = CAPTCHA detected, please verify manually.")
-                else:
-                    print(f"{url} = {response.status_code}")
-        except requests.exceptions.RequestException as e:
-            print(f"{url} = Error: {e}")
+        for attempt in range(retries):
+            try:
+                headers = {
+                    'User-Agent': random.choice(user_agents),
+                    'Cache-Control': 'no-cache'
+                }
+                with requests.Session() as session:
+                    session.headers.update(headers)
+                    response = session.get(url)
+                    logging.debug(f"URL: {url}, Status Code: {response.status_code}, Headers: {response.headers}")
+                    if response.status_code in error_codes:
+                        print(f"{url} = {response.status_code}, Message = \"{get_random_line('error_messages.txt')}\"")
+                    elif is_captcha_response(response.text):
+                        print(f"{url} = CAPTCHA detected, please verify manually.")
+                    else:
+                        print(f"{url} = {response.status_code}")
+                        break  # Break out of the retry loop on success
+            except requests.exceptions.RequestException as e:
+                logging.error(f"Error fetching {url}: {e}")
+                print(f"{url} = Error: {e}")
+            # Exponential backoff
+            time.sleep(2 ** attempt)
 
 # List of URLs to test
 urls = ['http://www.google.com', 'http://www.bing.com', 'https://chat.openai.com']
